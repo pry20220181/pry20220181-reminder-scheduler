@@ -1,5 +1,5 @@
 from appsettings_manager import get_app_settings
-import request #https://realpython.com/python-requests/
+import requests #https://realpython.com/python-requests/
 
 class CampaignReminder:
     def __init__(self, reminder_id):
@@ -14,7 +14,12 @@ class CampaignReminderManager:
         base_url = app_settings['RestApi']['BaseUrl']
         path = app_settings['RestApi']['CampaignReminderEndpoint']
         endpoint = f'{base_url}{path}'
+
+        #TODO: Ver sobre autenticacion, quiza poner una key o algo, pensarlo bien
         print(f'Se obtendra la info del endpoint {endpoint}')
+        response = requests.get(endpoint, verify=False)
+
+        print(response.json())
 
     def send_reminders(self, reminders: list):
         for reminder in reminders:
