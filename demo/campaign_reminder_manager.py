@@ -1,3 +1,6 @@
+from appsettings_manager import get_app_settings
+import request #https://realpython.com/python-requests/
+
 class CampaignReminder:
     def __init__(self, reminder_id):
         self.id = reminder_id
@@ -7,7 +10,11 @@ class CampaignReminderManager:
         pass
 
     def get_reminders_for_today(self):
-        pass
+        app_settings = get_app_settings()
+        base_url = app_settings['RestApi']['BaseUrl']
+        path = app_settings['RestApi']['CampaignReminderEndpoint']
+        endpoint = f'{base_url}{path}'
+        print(f'Se obtendra la info del endpoint {endpoint}')
 
     def send_reminders(self, reminders: list):
         for reminder in reminders:
@@ -15,11 +22,12 @@ class CampaignReminderManager:
 
 def test_campaign_reminder_manager():
     reminder_manager = CampaignReminderManager()
-    reminders_to_send = [
-        CampaignReminder(1),
-        CampaignReminder(2)
-    ]
-    reminder_manager.send_reminders(reminders_to_send)
+    reminder_manager.get_reminders_for_today()
+    # reminders_to_send = [
+    #     CampaignReminder(1),
+    #     CampaignReminder(2)
+    # ]
+    # reminder_manager.send_reminders(reminders_to_send)
 
 if __name__ == '__main__':
     test_campaign_reminder_manager()
