@@ -1,9 +1,28 @@
 from appsettings_manager import get_app_settings
 import requests #https://realpython.com/python-requests/
 
+#region Models
 class CampaignReminder:
-    def __init__(self, reminder_id):
+    def __init__(self, reminder_id, via, send_date, health_centers: list):
+        """
+        :param string via: SMS or Email
+        :param string send_date: when must be send the reminder
+        :param list:HealhCenter health_centers: the health centers where the campaign will be
+        """
         self.id = reminder_id
+        self.via = via
+        self.send_date = send_date
+        self.health_centers = health_centers
+
+class HealhCenter:
+    def __init__(self, id, name, address):
+        """
+        :param int id: the ID of the Health Center
+        """
+        self.id = id
+        self.name = name
+        self.address = address
+#endregion
 
 class CampaignReminderManager:
     """Class to the process of sending Campaign Reminders"""
@@ -21,11 +40,19 @@ class CampaignReminderManager:
         #TODO: Ver sobre autenticacion, quiza poner una key o algo, pensarlo bien
         response = requests.get(endpoint, verify=False)
         reminders = response.json()['value']['vaccinationCampaignReminders']
-        print(reminders)
+       
+
         reminders_to_return = []
         for reminder in reminders:
-            reminders_to_return.append(CampaignReminder(reminder['reminderId']))
+            #region Map Health Centers
+            health_centers = []
+            for health_center in reminder['healthCenters']:
+                health_centers.append(HealhCenter(health_center['healthCenterId'], health_center['name'], health_center['address']))
+            #endregion
+            
+            reminders_to_return.append(CampaignReminder(reminder['reminderId'], reminder['via'], reminder['sendDate'], health_centers))
         
+        print(reminders_to_return)
         return reminders_to_return
 
     def generate_html_email_message(self, reminder: CampaignReminder):
