@@ -7,25 +7,30 @@ class CampaignReminder:
 
 class CampaignReminderManager:
     def __init__(self):
-        pass
+        app_settings = get_app_settings()
+        self.base_url = app_settings['RestApi']['BaseUrl']
+        self.path = app_settings['RestApi']['CampaignReminderEndpoint']
 
     def get_reminders_for_today(self):
-        app_settings = get_app_settings()
-        base_url = app_settings['RestApi']['BaseUrl']
-        path = app_settings['RestApi']['CampaignReminderEndpoint']
-        
-        endpoint = f'{base_url}{path}'
+        endpoint = f'{self.base_url}{self.path}'
 
         #TODO: Ver sobre autenticacion, quiza poner una key o algo, pensarlo bien
         response = requests.get(endpoint, verify=False)
         reminders = response.json()['value']['vaccinationCampaignReminders']
-
+        print(reminders)
         reminders_to_return = []
         for reminder in reminders:
             reminders_to_return.append(CampaignReminder(reminder['reminderId']))
         
         return reminders_to_return
 
+    def generate_html_email_message(self, reminder: CampaignReminder):
+        html_email_to_return = '<h1>HTML Email Message</h1>'
+        return html_email_to_return
+    
+    def generate_sms_message(self, reminder: CampaignReminder):
+        sms_to_return = 'Hola, este es un SMS'
+        return sms_to_return
 
     def send_reminders(self, reminders: list):
         for reminder in reminders:
