@@ -45,8 +45,9 @@ class CampaignReminderManager:
         reminders_to_return = []
         for reminder in reminders:
             #region Map Health Centers
+            vaccination_campaign = reminder['vaccinationCampaign']
             health_centers = []
-            for health_center in reminder['healthCenters']:
+            for health_center in vaccination_campaign['healthCenters']:
                 health_centers.append(HealhCenter(health_center['healthCenterId'], health_center['name'], health_center['address']))
             #endregion
             
