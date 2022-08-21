@@ -1,5 +1,7 @@
+import re
 from appsettings_manager import get_app_settings
-import requests #https://realpython.com/python-requests/
+import requests
+from sms_sender import SmsSender #https://realpython.com/python-requests/
 from email_sender import EmailSender
 
 #region Models
@@ -53,12 +55,12 @@ class CampaignReminder:
 class CampaignReminderManager:
     """Class to the process of sending Campaign Reminders"""
 
-    def __init__(self, email_sender: EmailSender):
+    def __init__(self, email_sender: EmailSender, sms_sender: SmsSender):
         app_settings = get_app_settings()
         self.base_url = app_settings['RestApi']['BaseUrl']
         self.path = app_settings['RestApi']['CampaignReminderEndpoint']
         self.email_sender = email_sender
-
+        self.sms_sender = sms_sender
 
     def get_reminders_for_today(self):
         """Function to get the Campaign Reminders that must be send today"""
@@ -91,7 +93,7 @@ class CampaignReminderManager:
 
             reminders_to_return.append(CampaignReminder(reminder['reminderId'], reminder['via'], reminder['sendDate'], parent, vaccination_campaign))
         
-        print(reminders_to_return)
+        print("Reminders: ", reminders_to_return)
         return reminders_to_return
 
     def generate_html_email_message(self, reminder: CampaignReminder):
@@ -241,13 +243,13 @@ class CampaignReminderManager:
         """
         sent_reminders = []
         for reminder in reminders:
-            if reminder.id != 1:
-                break
+            # if reminder.id != 1:
+            #     break
 
             if reminder.via == "Email":
                 subject = f"Campaña Vacunación - {reminder.vaccination_campaign.name}"
                 message = self.generate_html_email_message(reminder)
-                print(f"Se enviara el recordatorio de campaña {reminder.id} al padre {reminder.parent.name} con correo {reminder.parent.email}")
+                print(f"Se enviará el recordatorio de campaña {reminder.id} al padre {reminder.parent.name} con correo {reminder.parent.email}")
                 with open(f'email_{reminder.id}.html', 'w', encoding='utf-8') as file:
                     file.write(message)
                 to = "u201810503@upc.edu.pe" #reminder.parent.email
@@ -256,14 +258,28 @@ class CampaignReminderManager:
                     sent_reminders.append(reminder)
             elif reminder.via == "SMS":
                 message = self.generate_sms_message(reminder)
+                phone_number = "1523625415" #reminder.parent.email
+                print(f"Se enviará el recordatorio de campaña {reminder.id} al padre {reminder.parent.name} a su telefono {phone_number}")
+                sms_was_sent = self.sms_sender.send_sms(phone_number, message)
+                if sms_was_sent:
+                    sent_reminders.append(reminder)
             else:
                 print(f"Invalid via for reminder {reminder.id}")
                 continue
-            
+
+        self.notify_sent_reminders(reminders)
+        return reminders
+        
+
+    def notify_sent_reminders(self, reminders: list):
+        print(f'{len(reminders)} reminders has been sent')
+        reminders_id = [reminder.id for reminder in reminders]
+        print("Sent Reminders", reminders_id)
 
 def test_campaign_reminder_manager():
     email_sender = EmailSender()
-    reminder_manager = CampaignReminderManager(email_sender)
+    sms_sender = SmsSender()
+    reminder_manager = CampaignReminderManager(email_sender, sms_sender)
     reminders_to_send = reminder_manager.get_reminders_for_today()
 
     reminder_manager.send_reminders(reminders_to_send)
