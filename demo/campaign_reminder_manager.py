@@ -239,21 +239,27 @@ class CampaignReminderManager:
         """Function that receives a list of reminders and send them one by one
         :param list reminders: the reminders that must be send
         """
+        sent_reminders = []
         for reminder in reminders:
             if reminder.id != 1:
                 break
+
             if reminder.via == "Email":
+                subject = f"Campaña Vacunación - {reminder.vaccination_campaign.name}"
                 message = self.generate_html_email_message(reminder)
+                print(f"Se enviara el recordatorio de campaña {reminder.id} al padre {reminder.parent.name} con correo {reminder.parent.email}")
+                with open(f'email_{reminder.id}.html', 'w', encoding='utf-8') as file:
+                    file.write(message)
+                to = "u201810503@upc.edu.pe" #reminder.parent.email
+                email_was_sent = self.email_sender.send_email(to, subject, message, "text/html")
+                if email_was_sent:
+                    sent_reminders.append(reminder)
             elif reminder.via == "SMS":
                 message = self.generate_sms_message(reminder)
             else:
                 print(f"Invalid via for reminder {reminder.id}")
                 continue
-            print(f"Se enviara el recordatorio de campaña {reminder.id} al padre {reminder.parent.name} con correo {reminder.parent.email}")
-            with open(f'email_{reminder.id}.html', 'w', encoding='utf-8') as file:
-                file.write(message)
-            to = "u201810503@upc.edu.pe" #reminder.parent.email
-            self.email_sender.send_email(to, message, "text/html")
+            
 
 def test_campaign_reminder_manager():
     email_sender = EmailSender()

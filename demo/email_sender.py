@@ -5,17 +5,17 @@ from sendgrid.helpers.mail import Mail, Email, To, Content
 class EmailSender:
     def __init__(self):
         pass
-    def send_email(self, to, message, content_type):
+    def send_email(self, to, subject, message, content_type):
         print(f"must be sent the email to {to}")
-        return
+        #return
         """
         :param str content_type: text/plain or text/html
         """
         sg = sendgrid.SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
-        from_email = Email("vnajforecast@outlook.com")  # Change to your verified sender
-        to_email = To(to)  # Change to your recipient
-        subject = "Sending with SendGrid is Fun"
+        from_email = Email("vnajforecast@outlook.com")
+        to_email = To(to)
         content = Content(content_type, message)
+
         mail = Mail(from_email, to_email, subject, content)
 
         # Get a JSON-ready representation of the Mail object
@@ -25,6 +25,13 @@ class EmailSender:
         response = sg.client.mail.send.post(request_body=mail_json)
         print(response.status_code)
         print(response.headers)
+        if response.status_code == 202:
+            print("Enviado correctamente")
+            return True
+        else:
+            print("Error al enviar correo")
+            return False
+        
 
 
 if __name__ == '__main__':
