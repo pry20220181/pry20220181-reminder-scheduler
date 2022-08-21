@@ -5,12 +5,15 @@ from sendgrid.helpers.mail import Mail, Email, To, Content
 class EmailSender:
     def __init__(self):
         pass
-    def send_email(self, to):
+    def send_email(self, to, message, content_type):
+        """
+        :param str content_type: text/plain or text/html
+        """
         sg = sendgrid.SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
         from_email = Email("vnajforecast@outlook.com")  # Change to your verified sender
         to_email = To(to)  # Change to your recipient
         subject = "Sending with SendGrid is Fun"
-        content = Content("text/plain", "and easy to do anywhere, even with Python. DEMO EMAIL SENDING PRY20220181")
+        content = Content(content_type, message)
         mail = Mail(from_email, to_email, subject, content)
 
         # Get a JSON-ready representation of the Mail object

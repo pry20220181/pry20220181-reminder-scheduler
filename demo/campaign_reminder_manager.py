@@ -1,5 +1,6 @@
 from appsettings_manager import get_app_settings
 import requests #https://realpython.com/python-requests/
+from email_sender import EmailSender
 
 #region Models
 class Parent:
@@ -52,10 +53,11 @@ class CampaignReminder:
 class CampaignReminderManager:
     """Class to the process of sending Campaign Reminders"""
 
-    def __init__(self):
+    def __init__(self, email_sender: EmailSender):
         app_settings = get_app_settings()
         self.base_url = app_settings['RestApi']['BaseUrl']
         self.path = app_settings['RestApi']['CampaignReminderEndpoint']
+        self.email_sender = email_sender
 
 
     def get_reminders_for_today(self):
@@ -96,7 +98,130 @@ class CampaignReminderManager:
         """Function that generate the HTML Email Message based on the information of the reminder parameter
         :param CampaignReminder reminder: the reminder that contains the info to generate the HTML Email Message
         """
-        html_email_to_return = '<h1>HTML Email Message</h1>'
+        style = """<style>
+        table,
+        td,
+        div,
+        h1,
+        p {
+            font-family: Arial, sans-serif;
+        }
+
+        .table-health-centers, .table-health-centers > td, .table-health-centers > th {
+            border: 1px solid black;
+        }
+    </style>"""
+
+        parent = reminder.parent
+        campaign = reminder.vaccination_campaign
+
+        vaccines_list_html = "<ul>"
+        for vaccine in campaign.vaccines:
+            vaccines_list_html += f"<li>{vaccine.name}</li>"
+        vaccines_list_html += "</ul>"
+
+        health_centers_table_html = '''<table style="border: 1px solid black; border-collapse: collapse; padding: 5px; margin-top: 5px;">
+        <tr>
+            <th style="border: 1px solid black; border-collapse: collapse; padding: 5px;">Nombre</th>
+            <th style="border: 1px solid black; border-collapse: collapse; padding: 5px;">Dirección</th>
+        </tr>'''
+        for health_center in campaign.health_centers:
+            health_centers_table_html += f"""<tr>
+                                                <th style="border: 1px solid black; border-collapse: collapse; padding: 5px;">{health_center.name}</th>
+                                                <th style="border: 1px solid black; border-collapse: collapse; padding: 5px;">{health_center.address}</th>
+                                            </tr>"""
+        health_centers_table_html += "</table>"
+
+        html_email_to_return = f"""<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="x-apple-disable-message-reformatting">
+    <title></title>
+    <!--[if mso]>
+    <noscript>
+      <xml>
+        <o:OfficeDocumentSettings>
+          <o:PixelsPerInch>96</o:PixelsPerInch>
+        </o:OfficeDocumentSettings>
+      </xml>
+    </noscript>
+    <![endif]-->
+    {style}
+</head>
+
+<body style="margin:0;padding:0;">
+    <table role="presentation"
+        style="width:100%;border-collapse:collapse;border:0;border-spacing:0;background:#ffffff;">
+        <tr>
+            <td align="center" style="padding:0;">
+                <table role="presentation"
+                    style="width:800px;border-collapse:collapse;border:1px solid #cccccc;border-spacing:0;text-align:left;">
+                    <tr id="banner_image_section">
+                        <td align="center" style="background:#277BC0;">
+                            <h1 style="color: white;">MINSA</h1>
+                        </td>
+                    </tr>
+                    <tr id="main_message_section">
+                        <td style="padding:36px 30px 42px 30px;">
+                            <table role="presentation"
+                                style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+                                <tr>
+                                    <td style="padding:0 0 6px 0;color:#153643;">
+                                        <span>Hola, {parent.name}.</span>
+                                        <br>
+                                        <br>
+                                        <span>Se aproxima la campaña {campaign.name}. Inicia el {campaign.start_date}
+                                            hasta el {campaign.end_date}</span>
+                                        <br>
+                                        <br>
+                                        <span>En esta campaña de vacunación se pondrán las siguientes vacunas:</span>
+                                        <br>
+                                        {vaccines_list_html}
+                                        <br>
+                                        <span>Los centros de salud donde se dará esta campaña de vacunación son los
+                                            siguientes:</span>
+                                        {health_centers_table_html}
+                                        <br>
+                                        <br>
+                                        <br>
+                                        <b>Este es un mensaje del MINSA</b>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr id="preguntas_frecuentes_consulta_chat_online_section">
+                        <td style="padding:20px;background:#277BC0;">
+                            <table role="presentation"
+                                style="width:100%;border-collapse:collapse;border:0;border-spacing:0;font-size:9px;font-family:Arial,sans-serif;">
+                                <tr>
+                                    <td style="padding:0;width:50%;" align="center">
+                                        <p
+                                            style="margin:0;font-size:14px;line-height:16px;font-family:Arial,sans-serif;color:#ffffff;">
+                                            ¿Necesitas ayuda o tienes alguna duda? Consulta la página de <a
+                                                href="https://cdn1-prd.beautymovers.com/nextgencommerce/docs/legal/cl/preguntas-frecuentes/2022.pdf"
+                                                style="color:white;text-decoration:underline;">Preguntas frecuentes</a>,
+                                            escribenos a <a href="mailto:minsa@gob.pe"
+                                                style="color:white;text-decoration:underline;">minsa@gob.pe</a> o
+                                            ingresa a nuestro <a
+                                                href="https://web.emtelco.co/yggdrasil/chat_belcorp_Ecommerce/indexCL.html"
+                                                style="color:white;text-decoration:underline;">chat en línea.</a>
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>"""
         return html_email_to_return
     
     def generate_sms_message(self, reminder: CampaignReminder):
@@ -111,10 +236,24 @@ class CampaignReminderManager:
         :param list reminders: the reminders that must be send
         """
         for reminder in reminders:
+            if reminder.id != 1:
+                break
+            if reminder.via == "Email":
+                message = self.generate_html_email_message(reminder)
+            elif reminder.via == "SMS":
+                message = self.generate_sms_message(reminder)
+            else:
+                print(f"Invalid via for reminder {reminder.id}")
+                continue
             print(f"Se enviara el recordatorio de campaña {reminder.id} al padre {reminder.parent.name} con correo {reminder.parent.email}")
+            with open(f'email_{reminder.id}.html', 'w', encoding='utf-8') as file:
+                file.write(message)
+            to = "u201810503@upc.edu.pe" #reminder.parent.email
+            self.email_sender.send_email(to, message, "text/html")
 
 def test_campaign_reminder_manager():
-    reminder_manager = CampaignReminderManager()
+    email_sender = EmailSender()
+    reminder_manager = CampaignReminderManager(email_sender)
     reminders_to_send = reminder_manager.get_reminders_for_today()
 
     reminder_manager.send_reminders(reminders_to_send)
