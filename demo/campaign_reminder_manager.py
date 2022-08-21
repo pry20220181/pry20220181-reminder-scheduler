@@ -114,6 +114,10 @@ class CampaignReminderManager:
 
         parent = reminder.parent
         campaign = reminder.vaccination_campaign
+        start_date = campaign.start_date[0:10]
+        start_time = campaign.start_date[11:16]
+        end_date = campaign.end_date[0:10]
+        end_time = campaign.end_date[11:16]
 
         vaccines_list_html = "<ul>"
         for vaccine in campaign.vaccines:
@@ -173,8 +177,8 @@ class CampaignReminderManager:
                                         <span>Hola, {parent.name}.</span>
                                         <br>
                                         <br>
-                                        <span>Se aproxima la campaña {campaign.name}. Inicia el {campaign.start_date}
-                                            hasta el {campaign.end_date}</span>
+                                        <span>Se aproxima la campaña <b>"{campaign.name}"</b>. Inicia el {start_date} a las {start_time}
+                                            hasta el {end_date} a las {end_time}</span>
                                         <br>
                                         <br>
                                         <span>En esta campaña de vacunación se pondrán las siguientes vacunas:</span>
@@ -202,12 +206,12 @@ class CampaignReminderManager:
                                         <p
                                             style="margin:0;font-size:14px;line-height:16px;font-family:Arial,sans-serif;color:#ffffff;">
                                             ¿Necesitas ayuda o tienes alguna duda? Consulta la página de <a
-                                                href="https://cdn1-prd.beautymovers.com/nextgencommerce/docs/legal/cl/preguntas-frecuentes/2022.pdf"
+                                                href="https://www.google.com"
                                                 style="color:white;text-decoration:underline;">Preguntas frecuentes</a>,
                                             escribenos a <a href="mailto:minsa@gob.pe"
                                                 style="color:white;text-decoration:underline;">minsa@gob.pe</a> o
                                             ingresa a nuestro <a
-                                                href="https://web.emtelco.co/yggdrasil/chat_belcorp_Ecommerce/indexCL.html"
+                                                href="https://www.google.com"
                                                 style="color:white;text-decoration:underline;">chat en línea.</a>
                                         </p>
                                     </td>
