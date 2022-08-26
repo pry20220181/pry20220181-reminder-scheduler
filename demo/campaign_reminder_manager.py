@@ -59,6 +59,7 @@ class CampaignReminderManager:
         app_settings = get_app_settings()
         self.base_url = app_settings['RestApi']['BaseUrl']
         self.path = app_settings['RestApi']['CampaignReminderEndpoint']
+        self.notify_sent_reminders_path = app_settings['RestApi']['NotifySentRemindersEndpoint']
         self.email_sender = email_sender
         self.sms_sender = sms_sender
 
@@ -275,6 +276,14 @@ class CampaignReminderManager:
         print(f'{len(reminders)} reminders has been sent')
         reminders_id = [reminder.id for reminder in reminders]
         print("Sent Reminders", reminders_id)
+        endpoint = f'{self.base_url}{self.notify_sent_reminders_path}'
+        payload = {
+            'AlreadySentReminders': "1,2"#reminders_id
+        }
+
+        #TODO: Ver sobre autenticacion, quiza poner una key o algo, pensarlo bien
+        response = requests.delete(endpoint, data= reminders_id, verify=False)
+        print("Response delete", response)#['value']['vaccinationCampaignReminders']
 
 def test_campaign_reminder_manager():
     email_sender = EmailSender()
