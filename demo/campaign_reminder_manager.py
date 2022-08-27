@@ -147,7 +147,7 @@ class CampaignReminderManager:
                                         <br>
                                         <br>
                                         <br>
-                                        <b>Este es un mensaje del MINSA</b>
+                                        <b>Este es un mensaje del Ministerio de Salud</b>
                                     </td>
                                 </tr>
                             </table>
