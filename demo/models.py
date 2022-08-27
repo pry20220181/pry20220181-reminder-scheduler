@@ -5,6 +5,12 @@ class Parent:
         self.name = name
         self.email = email
 
+class Child:
+    def __init__(self, id, full_name, dni):
+        self.id = id
+        self.full_name = full_name
+        self.dni = dni
+
 class HealhCenter:
     def __init__(self, id, name, address):
         """
@@ -32,8 +38,12 @@ class VaccinationCampaign:
         self.vaccines = vaccines
 
 class VaccinationAppointment:
-    def __init__(self):
-        pass
+    def __init__(self, id, appointment_datetime, child: Child, health_center: HealhCenter, vaccines: list):
+        self.id = id
+        self.appointment_datetime = appointment_datetime
+        self.child = child
+        self.health_center = health_center
+        self.vaccines = vaccines
 
 class CampaignReminder:
     def __init__(self, reminder_id, via, send_date, parent: Parent, vaccination_campaign: VaccinationCampaign):
@@ -48,6 +58,10 @@ class CampaignReminder:
         self.vaccination_campaign = vaccination_campaign
 
 class AppointmentReminder:
-    def __init__(self, reminder_id):
+    def __init__(self, reminder_id, via, send_date, parent: Parent, vaccination_appointment: VaccinationAppointment):
         self.id = reminder_id
+        self.via = via
+        self.send_date = send_date
+        self.parent = parent
+        self.vaccination_appointment = vaccination_appointment
 #endregion
