@@ -29,9 +29,8 @@ class AppointmentReminderManager:
             parent_json = reminder['parent']
             child_json = vaccination_appointment_json['child']
             health_center_json = vaccination_appointment_json['healthCenter']
-            #parent = Parent(parent_json['parentId'], parent_json['firstname'], parent_json['email'])
-            parent = Parent(parent_json['parentId'], None, None)
-            health_center = HealhCenter(health_center_json['healthCenterId'], health_center_json['name'], None)
+            parent = Parent(parent_json['parentId'], parent_json['firstname'], parent_json['email'])
+            health_center = HealhCenter(health_center_json['healthCenterId'], health_center_json['name'], health_center_json['address'])
             child = Child(child_json['childId'], child_json['fullname'], child_json['dni'])
 
             #region Map Vaccines
