@@ -24,6 +24,12 @@ class Vaccine:
     def __init__(self, name):
         self.name = name
 
+class Dose:
+    def __init__(self, dose_id, vaccine_name, dose_number):
+        self.dose_id = dose_id
+        self.vaccine_name = vaccine_name
+        self.dose_number = dose_number
+
 class VaccinationCampaign:
     def __init__(self, id, name, description, start_date, end_date, health_centers: list, vaccines: list):
         """
@@ -64,4 +70,13 @@ class AppointmentReminder:
         self.send_date = send_date
         self.parent = parent
         self.vaccination_appointment = vaccination_appointment
+
+class DoseReminder:
+    def __init__(self, reminder_id, via, send_date, parent: Parent, child: Child, dose: Dose):
+        self.id = reminder_id
+        self.via = via
+        self.send_date = send_date
+        self.parent = parent
+        self.child = child
+        self.dose = dose
 #endregion
