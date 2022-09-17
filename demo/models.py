@@ -79,4 +79,13 @@ class DoseReminder:
         self.parent = parent
         self.child = child
         self.dose = dose
+
+class DoseReminderForEmail:
+    def __init__(self, reminder_id, parent_name, parent_email, child_name, doses):
+        self.id = reminder_id
+        self.via = "Email"
+        self.parent_name = parent_name
+        self.parent_email = parent_email
+        self.child_name = child_name
+        self.doses = doses
 #endregion
