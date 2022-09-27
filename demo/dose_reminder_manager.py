@@ -241,7 +241,7 @@ class DoseReminderManager:
                 print(f"Invalid via for reminder {reminder.id}")
                 continue
 
-        self.notify_sent_reminders(reminders)
+        #self.notify_sent_reminders(reminders)
         return reminders
 
     def notify_sent_reminders(self, reminders: list):

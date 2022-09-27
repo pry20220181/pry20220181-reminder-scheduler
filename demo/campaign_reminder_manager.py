@@ -197,8 +197,8 @@ class CampaignReminderManager:
         """
         sent_reminders = []
         for reminder in reminders:
-            # if reminder.id != 1:
-            #     break
+            if reminder.id != 1:
+                break
 
             if reminder.via == "Email":
                 subject = f"Campaña Vacunación - {reminder.vaccination_campaign.name}"
@@ -221,7 +221,7 @@ class CampaignReminderManager:
                 print(f"Invalid via for reminder {reminder.id}")
                 continue
 
-        self.notify_sent_reminders(reminders)
+        #self.notify_sent_reminders(reminders)
         return reminders
         
 

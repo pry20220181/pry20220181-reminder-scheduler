@@ -7,7 +7,7 @@ class EmailSender:
         pass
     def send_email(self, to, subject, message, content_type):
         print(f"must be sent the email to {to}")
-        #return True
+        return True
         """
         :param str content_type: text/plain or text/html
         """
